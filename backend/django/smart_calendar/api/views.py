@@ -1,16 +1,25 @@
 import json
 
-from django.db import connection, models
+from db.models import Event
+from django.core import serializers
+from django.db import connection
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 
 @csrf_exempt
-def func(request):
+def events(request):
     # TODO:
     # returning all or exact events from DB in JSON format
-    return JsonResponse({})
+    # /events?year=2026&month=2
+    year = request.GET.get("year")
+    month = request.GET.get("month")
+    json_string = serializers.serialize(
+        "json", Event.objects.filter(start_date__year=year, start_date__month=month)
+    )
+    result = json.loads(json_string)
+    return JsonResponse(result)
 
 
 def dictfetchall(cursor):
@@ -30,6 +39,7 @@ def exec_sql_request(request):
 
     for action in data_dict["actions"]:
         type_sql_request = action["type"]
+
         sql_request = action["sql"]
 
         with connection.cursor() as cursor:

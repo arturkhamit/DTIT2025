@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "api",
+    "db",
 ]
 
 MIDDLEWARE = [
@@ -78,7 +80,7 @@ DATABASES = {
         "NAME": "calendardb",
         "USER": "calendar_user",
         "PASSWORD": "mypassword",
-        "HOST": "host.docker.internal",
+        "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
         "PORT": "5432",
     }
 }
