@@ -80,8 +80,8 @@ WSGI_APPLICATION = "smart_calendar.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "receiptsdb",
-        "USER": "receipts_user",
+        "NAME": "calendardb",
+        "USER": "calendar_user",
         "PASSWORD": "mypassword",
         "HOST": "localhost",
         "PORT": "5432",
