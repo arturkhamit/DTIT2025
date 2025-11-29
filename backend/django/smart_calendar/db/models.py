@@ -17,7 +17,7 @@ class Event(models.Model):
     start_date = models.DateTimeField(verbose_name="starting date and time of an event")
     end_date = models.DateTimeField(verbose_name="ending date and time of an event")
 
-    event_name = models.TextField(verbose_name="name of an event")
+    name = models.TextField(verbose_name="name of an event")
     decsription = models.TextField(verbose_name="description of an event")
 
-    color = models.TextField(verbose_name="displayed color of an event")
+    category = models.TextField(verbose_name="category of an event")

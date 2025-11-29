@@ -20,13 +20,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 import os
 
-from dotenv import load_dotenv
-
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-DOTENV_PATH = BASE_DIR / ".env"
-load_dotenv(dotenv_path=DOTENV_PATH)
-SECRET_KEY = os.getenv("SECRET_DJANGO_KEY")
-
+SECRET_KEY = os.environ.get("SECRET_DJANGO_KEY")
+DEBUG = os.environ.get("DEBUG") == "True"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -83,7 +78,7 @@ DATABASES = {
         "NAME": "calendardb",
         "USER": "calendar_user",
         "PASSWORD": "mypassword",
-        "HOST": "localhost",
+        "HOST": "host.docker.internal",
         "PORT": "5432",
     }
 }
