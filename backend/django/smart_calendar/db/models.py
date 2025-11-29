@@ -18,6 +18,15 @@ class Event(models.Model):
     end_date = models.DateTimeField(verbose_name="ending date and time of an event")
 
     name = models.TextField(verbose_name="name of an event")
-    decsription = models.TextField(verbose_name="description of an event")
+    description = models.TextField(verbose_name="description of an event")
 
     category = models.TextField(verbose_name="category of an event")
+
+    class Meta:
+        db_table = "event"
+        verbose_name = "event"
+        verbose_name_plural = "events"
+        ordering = ["id"]
+
+    def __str__(self):
+        return "event model"

@@ -80,7 +80,7 @@ DATABASES = {
         "NAME": "calendardb",
         "USER": "calendar_user",
         "PASSWORD": "mypassword",
-        "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
+        "HOST": "calendar_db",
         "PORT": "5432",
     }
 }

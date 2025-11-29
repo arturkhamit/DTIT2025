@@ -4,22 +4,28 @@ from db.models import Event
 from django.core import serializers
 from django.db import connection
 from django.http import JsonResponse
-from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 
 @csrf_exempt
-def events(request):
-    # TODO:
-    # returning all or exact events from DB in JSON format
-    # /events?year=2026&month=2
+def get_events(request):
     year = request.GET.get("year")
     month = request.GET.get("month")
-    json_string = serializers.serialize(
-        "json", Event.objects.filter(start_date__year=year, start_date__month=month)
+    if not year or not month:
+        return JsonResponse({"error": "There is no year or month"}, status=400)
+
+    print(Event.objects.count())
+
+    for ev in Event.objects.all():
+        print(ev)
+
+    events = Event.objects.filter(
+        start_date__year=int(year), start_date__month=int(month)
     )
+
+    json_string = serializers.serialize("json", events)
     result = json.loads(json_string)
-    return JsonResponse(result)
+    return JsonResponse(result, safe=False)
 
 
 def dictfetchall(cursor):

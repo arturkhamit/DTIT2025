@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import events, exec_sql_request
+from .views import exec_sql_request, get_events
 
 urlpatterns = [
     path(
@@ -8,5 +8,5 @@ urlpatterns = [
         exec_sql_request,
         name="exec-sql-request",
     ),
-    path("events/", events, name="events"),
+    path("get_events/", get_events, name="get_events"),
 ]
