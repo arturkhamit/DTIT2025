@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: calendar_db
+    restart: always
+    environment:
+      POSTGRES_USER: calendar_user
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: calendardb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
