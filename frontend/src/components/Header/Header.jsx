@@ -79,7 +79,7 @@ export default function Header() {
           <div className='logo-wrapper'>
             <div className='logo-circle'></div>
             <Link to='/about' className='logo'>
-              Logo
+              IVAN DAUN
             </Link>
           </div>
           <BurgerMenu

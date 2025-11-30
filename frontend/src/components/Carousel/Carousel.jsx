@@ -12,19 +12,19 @@ const DEFAULT_ITEMS = [
     id: 1,
     icon: (
       <div>
-        <CountUp from={0} to={1488} duration={2.5} />
+        <CountUp from={0} to={15} duration={2.5} />
         <span className='countup-symbol'></span>
       </div>
     ),
   },
   {
-    title: "OS Grade",
+    title: "How much projects did I finish this month?",
     description: "",
     id: 2,
     icon: (
       <div>
-        <CountUp from={0} to={3} duration={2.5} />
-        <span className='countup-symbol'>/25</span>
+        <CountUp from={0} to={2} duration={2.5} />
+        <span className='countup-symbol'>+</span>
       </div>
     ),
   },
@@ -40,12 +40,12 @@ const DEFAULT_ITEMS = [
     ),
   },
   {
-    title: "Pasha percentage this month",
+    title: "Overall productivity increase",
     description: "",
     id: 1,
     icon: (
       <div>
-        <CountUp from={0} to={100} duration={2.5} />
+        <CountUp from={0} to={39} duration={2.5} />
         <span className='countup-symbol'>%</span>
       </div>
     ),
