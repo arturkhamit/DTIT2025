@@ -1,5 +1,6 @@
 from typing import List
 
+import httpx
 import requests
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,6 +17,104 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/event/get/{id}")
+async def get_event(id: int):
+    django_url = f"{DJANGO_BACKEND_URL}/get_event/"
+    params = {"id": id}
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(django_url, params=params)
+
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=response.status_code,
+                detail=f"Django Error: {response.text}",
+            )
+
+        return response.json()
+
+    except httpx.ConnectError:
+        raise HTTPException(
+            status_code=503,
+            detail="Could not connect to the Django backend.",
+        )
+
+
+@app.delete("/event/delete/{id}")
+async def delete_event(id: int):
+    django_url = f"{DJANGO_BACKEND_URL}/delete_event/"
+    params = {"id": id}
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(django_url, params=params)
+
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=response.status_code,
+                detail=f"Django Error: {response.text}",
+            )
+
+        return response.json()
+
+    except httpx.ConnectError:
+        raise HTTPException(
+            status_code=503,
+            detail="Could not connect to the Django backend.",
+        )
+
+
+@app.post("/event/create/")
+async def create_event(request):
+    django_url = f"{DJANGO_BACKEND_URL}/create_event/"
+
+    try:
+        body = await request.json()
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(django_url, json=body)
+
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=response.status_code,
+                detail=f"Django Error: {response.text}",
+            )
+
+        return response.json()
+
+    except requests.exceptions.ConnectionError:
+        raise HTTPException(
+            status_code=503,
+            detail="Could not connect to the Django backend.",
+        )
+
+
+@app.patch("/event/update/{id}")
+async def update_event(request):
+    django_url = f"{DJANGO_BACKEND_URL}/update_event/"
+
+    try:
+        body = await request.json()
+
+        async with httpx.AsyncClient() as client:
+            response = await client.patch(django_url, json=body)
+
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=response.status_code,
+                detail=f"Django Error: {response.text}",
+            )
+
+        return response.json()
+
+    except requests.exceptions.ConnectionError:
+        raise HTTPException(
+            status_code=503,
+            detail="Could not connect to the Django backend.",
+        )
 
 
 # Structure for a single SQL action
@@ -43,7 +142,7 @@ def get_events(year: int, month: int):
                 detail=f"Django Error: {response.text}",
             )
 
-        return response.text
+        return response.json()
 
     except requests.exceptions.ConnectionError:
         raise HTTPException(

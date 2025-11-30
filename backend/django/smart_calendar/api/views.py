@@ -2,7 +2,9 @@ import json
 
 from db.models import Event
 from django.core import serializers
-from django.db import connection
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import DatabaseError, connection
+from django.db.models import ProtectedError
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -12,12 +14,9 @@ def get_events(request):
     year = request.GET.get("year")
     month = request.GET.get("month")
     if not year or not month:
-        return JsonResponse({"error": "There is no year or month"}, status=400)
-
-    print(Event.objects.count())
-
-    for ev in Event.objects.all():
-        print(ev)
+        return JsonResponse(
+            {"status": "error", "message": "There is year or month"}, status=400
+        )
 
     events = Event.objects.filter(
         start_date__year=int(year), start_date__month=int(month)
@@ -26,6 +25,114 @@ def get_events(request):
     json_string = serializers.serialize("json", events)
     result = json.loads(json_string)
     return JsonResponse(result, safe=False)
+
+
+def get_event(request):
+    id = request.GET.get("id")
+    if not id:
+        return JsonResponse(
+            {"status": "error", "message": "There is no id"}, status=400
+        )
+
+    events = Event.objects.get(start_date__year=int(year), start_date__month=int(month))
+
+    json_string = serializers.serialize("json", events)
+    result = json.loads(json_string)
+    return JsonResponse(result, safe=False)
+
+
+@csrf_exempt
+def delete_event(request):
+    id = request.DELETE.get("id")
+    if not id:
+        return JsonResponse(
+            {"status": "error", "message": "There is no id"}, status=400
+        )
+
+    try:
+        event = Event.objects.get(id=id)
+        json_data = serializers.serialize("json", event)
+    except ObjectDoesNotExist:
+        return JsonResponse(
+            {"status": "error", "message": f"There is no row with id {id}"}, status=400
+        )
+    except ProtectedError:
+        return JsonResponse(
+            {"status": "error", "message": f"Failed to delete row {id}"}, status=400
+        )
+
+    return JsonResponse(json_data)
+
+
+@csrf_exempt
+def create_event(request):
+    name = request.POST.get("name")
+    start_date = request.POST.get("start_date")
+    end_date = request.POST.get("end_date")
+    description = request.POST.get("description")
+    category = request.POST.get("category")
+    if not name or not start_date or not end_date or not description or not category:
+        return JsonResponse(
+            {"status": "error", "message": "Not enough parameters"}, status=400
+        )
+
+    try:
+        Event.objects.create(
+            name=name,
+            start_date=start_date,
+            end_date=end_date,
+            description=description,
+            category=category,
+        )
+    except DatabaseError:
+        return JsonResponse(
+            {"status": "error", "message": "Database error"}, status=400
+        )
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": f"{e}"}, status=400)
+
+    return JsonResponse({"status": "success"}, status=200)
+
+
+@csrf_exempt
+def update_event(request):
+    id = request.PATCH.get("id")
+    if not id:
+        return JsonResponse(
+            {"status": "error", "message": "There is no id"}, status=400
+        )
+
+    name = request.PATCH.get("name")
+    start_date = request.PATCH.get("start_date")
+    end_date = request.PATCH.get("end_date")
+    description = request.PATCH.get("description")
+    category = request.PATCH.get("category")
+
+    try:
+        event = Event.objects.get(id=id)
+        if name:
+            event.name = name
+        if start_date:
+            event.start_date = start_date
+        if end_date:
+            event.end_date = end_date
+        if description:
+            event.description = description
+        if category:
+            event.category = category
+
+        event.save()
+
+    except ObjectDoesNotExist:
+        return JsonResponse(
+            {"status": "error", "message": f"There is no row with id {id}"}, status=400
+        )
+    except ProtectedError:
+        return JsonResponse(
+            {"status": "error", "message": f"Failed to delete row {id}"}, status=400
+        )
+
+    return JsonResponse({"status": "success"}, status=200)
 
 
 def dictfetchall(cursor):
@@ -39,7 +146,9 @@ def exec_sql_request(request):
     try:
         data_dict = json.loads(raw_data)
     except json.JSONDecodeError:
-        return JsonResponse({"message": "invalid dictionary"})
+        return JsonResponse(
+            {"status": "error", "message": "Invalid dictionary"}, status=400
+        )
     print(data_dict)
     result = {}
 
