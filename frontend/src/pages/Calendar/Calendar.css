@@ -103,14 +103,13 @@
 
 .calendar-header__month {
   font-size: 2rem;
-  font-weight: 500;
+  font-weight: 800;
 }
 
 .calendar-header__year {
   opacity: 0.7;
-  letter-spacing: 0.15em;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  font-size: 0.9rem;
 }
 
 .calendar-controls {
@@ -163,27 +162,24 @@
 .calendar-grid {
   flex: 1;
   padding: 0 30px 30px;
-  display: grid;
-  gap: 4px;
-}
-
-.calendar-week {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 4px;
 }
 
 .calendar-cell {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
-  min-height: 75px;
-  height: 100%;
+  min-height: 110px;
+  height: 110px;
+  flex: 0 0 110px;
   padding: 12px;
   color: #fff;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   border: 1px solid rgba(255, 255, 255, 0.04);
+  overflow: hidden;
 }
 
 .calendar-cell:not(.is-muted, .is-today):hover {
@@ -201,9 +197,9 @@
 }
 
 .calendar-cell.is-today {
-  background: linear-gradient(135deg, #ff4e50, #fc913a);
+  background: linear-gradient(135deg, #d23580, #a71c5a);
   border-color: transparent;
-  box-shadow: 0 10px 25px rgba(252, 145, 58, 0.3);
+  box-shadow: 0 10px 25px #d2358156;
 }
 
 .calendar-cell__day {
@@ -221,6 +217,9 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .calendar-event-chip {
@@ -236,6 +235,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .calendar-event-chip.more-chip {
@@ -414,6 +414,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  white-space: pre-wrap;
 }
 
 .assistant-chat__bubble--user {
@@ -492,7 +493,7 @@ i.submit-btn {
 }
 
 .assistant-chat__record-btn.is-active {
-  background: #ff4e50;
+  background: #d23580;
   color: #fff;
   border-color: transparent;
 }
@@ -531,7 +532,7 @@ i.submit-btn {
   height: 36px;
   border-radius: 50%;
   border: none;
-  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  background: linear-gradient(135deg, #d23580, #a71c5a);
   color: #fff;
   font-size: 0.9rem;
   cursor: pointer;
@@ -721,6 +722,11 @@ i.submit-btn {
 }
 
 .day-modal__btn--primary {
-  background: linear-gradient(135deg, #ff4e50, #fc913a);
+  background: linear-gradient(135deg, #d23580, #a71c5a);
   color: #fff;
+}
+.calendar-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
 }

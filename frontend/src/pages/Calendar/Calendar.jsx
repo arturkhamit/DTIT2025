@@ -45,10 +45,18 @@ const EVENTS_API_URL_CONFIG = "http://10.10.91.219:8001/event";
 
 const padNumber = (value) => String(value).padStart(2, "0");
 
-const parseServerDate = (dateString) => {
-  if (!dateString) return null;
+const parseServerDate = (value) => {
+  if (!value) return null;
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value;
+  }
   try {
-    const parsedDate = new Date(dateString);
+    const rawString = typeof value === "string" ? value : String(value);
+    let normalized = rawString.trim();
+    if (normalized.startsWith("Date ")) {
+      normalized = normalized.slice(5).trim();
+    }
+    const parsedDate = new Date(normalized);
     if (Number.isNaN(parsedDate.getTime())) {
       return null;
     }
@@ -68,13 +76,21 @@ const normalizeServerEvents = (incomingEvents = []) =>
       _endDate: endDate,
       _localId:
         eventItem._localId ||
-        eventItem.id ||
+        eventItem.pk ||
         `${eventItem.name || "event"}-${eventItem.start_date || Date.now()}`,
     };
   });
 
 const getEventColor = (category) =>
   CATEGORY_COLORS[category] || "rgba(255, 255, 255, 0.15)";
+
+const normalizeCategoryValue = (category) => {
+  if (!category) return "personal";
+  const match = CATEGORY_OPTIONS.find(
+    (option) => option.toLowerCase() === String(category).toLowerCase()
+  );
+  return match || "personal";
+};
 
 const formatDateToServer = (date) => {
   if (!date) return "";
@@ -187,7 +203,7 @@ export default function Calendar() {
         start_date: parseServerDate(eventItem.fields.start_date),
         end_date: parseServerDate(eventItem.fields.end_date),
         name: eventItem.fields.name,
-        category: eventItem.fields.category,
+        category: normalizeCategoryValue(eventItem.fields.category),
       }));
 
       setEvents(normalizeServerEvents(eventsTemp));
@@ -242,7 +258,7 @@ export default function Calendar() {
         ...eventItem,
         _localId:
           eventItem._localId ||
-          eventItem.id ||
+          eventItem.pk ||
           `${eventItem.name || "event"}-${eventItem.start_date || Date.now()}`,
       }))
     );
@@ -422,7 +438,11 @@ export default function Calendar() {
       },
     ]);
     setIsChatting(false);
-    window.location.reload();
+    setTimeout(() => {
+      if (assistantResponse?.includes("[event]")) {
+        fetchEventsData();
+      }
+    }, 300);
   };
 
   const handleClearChat = () => {
@@ -641,22 +661,25 @@ export default function Calendar() {
         }
         return {
           ...eventItem,
-          [field]: value,
+          [field]: field === "category" ? normalizeCategoryValue(value) : value,
         };
       })
     );
   };
 
   const handleDeleteModalEvent = (eventId) => {
+    console.log(eventId);
+
     const deletedEvent = modalEvents.find(
       (eventItem) => eventItem._localId === eventId
     );
+
     setModalEvents((prev) =>
       prev.filter((eventItem) => eventItem._localId !== eventId)
     );
     setRemovedEventIds((prev) => {
-      if (deletedEvent?.id && !prev.includes(deletedEvent.id)) {
-        return [...prev, deletedEvent.id];
+      if (deletedEvent?.pk && !prev.includes(deletedEvent.pk)) {
+        return [...prev, deletedEvent.pk];
       }
       return prev;
     });
@@ -672,9 +695,9 @@ export default function Calendar() {
       newEventForm.time
     );
     const newEvent = {
-      id: undefined,
+      pk: undefined,
       name: newEventForm.name.trim(),
-      category: newEventForm.category,
+      category: normalizeCategoryValue(newEventForm.category),
       start_date: formatDateToServer(baseDate),
       end_date: formatDateToServer(baseDate),
       _startDate: baseDate,
@@ -699,7 +722,7 @@ export default function Calendar() {
     end_date
     desc(optional)
     category
-     */
+    */
     const buildPayload = (eventItem) => {
       const startDate =
         eventItem._startDate ||
@@ -735,12 +758,10 @@ export default function Calendar() {
 
       const upsertPromises = modalEvents.map(async (eventItem) => {
         const payload = buildPayload(eventItem);
-        console.log(payload);
-
-        const isUpdate = Boolean(eventItem.id);
+        const isUpdate = Boolean(eventItem.pk);
         const response = await fetch(
           isUpdate
-            ? `${EVENTS_API_URL_CONFIG}/update/${eventItem.id}`
+            ? `${EVENTS_API_URL_CONFIG}/update/${eventItem.pk}`
             : `${EVENTS_API_URL_CONFIG}/create`,
           {
             method: isUpdate ? "PATCH" : "POST",
@@ -870,7 +891,7 @@ export default function Calendar() {
                           eventsByDay[cell.day] && (
                             <div className='calendar-events'>
                               {eventsByDay[cell.day]
-                                .slice(0, 3)
+                                .slice(0, 2)
                                 .map((eventItem) => {
                                   const eventTimeLabel =
                                     eventItem._startDate
@@ -886,7 +907,8 @@ export default function Calendar() {
                                     <div
                                       className='calendar-event-chip'
                                       key={
-                                        eventItem.id ||
+                                        eventItem.pk ||
+                                        eventItem._localId ||
                                         `${eventItem.name}-${eventItem.start_date}`
                                       }
                                       style={{
@@ -906,10 +928,12 @@ export default function Calendar() {
                                     </div>
                                   );
                                 })}
-                              {eventsByDay[cell.day].length > 3 && (
-                                <div className='calendar-event-chip more-chip'>
-                                  +{eventsByDay[cell.day].length - 3}{" "}
-                                  more
+                              {eventsByDay[cell.day].length > 2 && (
+                                <div
+                                  className='calendar-event-chip more-chip'
+                                  title={`${eventsByDay[cell.day].length - 2} more events`}
+                                >
+                                  ...
                                 </div>
                               )}
                             </div>
