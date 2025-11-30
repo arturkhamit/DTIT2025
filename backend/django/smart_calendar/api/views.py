@@ -27,6 +27,7 @@ def get_events(request):
     return JsonResponse(result, safe=False)
 
 
+@csrf_exempt
 def get_event(request):
     id = request.get("id")
     if not id:
@@ -34,7 +35,7 @@ def get_event(request):
             {"status": "error", "message": "There is no id"}, status=400
         )
 
-    events = Event.objects.get(start_date__year=int(year), start_date__month=int(month))
+    events = Event.objects.get(id=int(id))
 
     json_string = serializers.serialize("json", events)
     result = json.loads(json_string)
@@ -43,15 +44,15 @@ def get_event(request):
 
 @csrf_exempt
 def delete_event(request):
-    id = request.get("id")
+    print(request)
+    id = request.GET.get("id")
     if not id:
         return JsonResponse(
             {"status": "error", "message": "There is no id"}, status=400
         )
 
     try:
-        event = Event.objects.get(id=id)
-        json_data = serializers.serialize("json", event)
+        Event.objects.filter(id=id).delete()
     except ObjectDoesNotExist:
         return JsonResponse(
             {"status": "error", "message": f"There is no row with id {id}"}, status=400
@@ -61,7 +62,7 @@ def delete_event(request):
             {"status": "error", "message": f"Failed to delete row {id}"}, status=400
         )
 
-    return JsonResponse(json_data)
+    return JsonResponse({"status": "success"}, status=200)
 
 
 @csrf_exempt
@@ -101,7 +102,7 @@ def create_event(request):
 
 @csrf_exempt
 def update_event(request):
-    id = request.PATCH.get("id")
+    id = request.GET.get("id")
     if not id:
         return JsonResponse(
             {"status": "error", "message": "There is no id"}, status=400
@@ -192,7 +193,12 @@ def exec_sql_request(request):
                     except Exception as e:
                         result["error"] = str(e)
                 case "recommendation":
-                    result["error"] = "recommendation, lol"
+                    try:
+                        cursor.execute(sql_request)
+                        result["message"] = "reccomendation success"
+                        result["fetched_data"] = dictfetchall(cursor)
+                    except Exception as e:
+                        result["error"] = str(e)
                 case _:
                     result["error"] = {
                         "message": "Error: No such method",

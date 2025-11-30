@@ -59,7 +59,7 @@ async def delete_event(id: int):
 
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(django_url, params=params)
+            response = await client.delete(django_url, params=params)
 
         if response.status_code != 200:
             raise HTTPException(
@@ -105,14 +105,14 @@ async def create_event(request: Request):
 
 
 @app.patch("/event/update/{id}")
-async def update_event(request):
+async def update_event(id: int, request: Request):
     django_url = f"{DJANGO_BACKEND_URL}/update_event/"
 
     try:
         body = await request.json()
 
         async with httpx.AsyncClient() as client:
-            response = await client.patch(django_url, json=body)
+            response = await client.patch(django_url, params={"id": id}, json=body)
 
         if response.status_code != 200:
             raise HTTPException(
@@ -129,13 +129,13 @@ async def update_event(request):
         )
 
 
-# Structure for a single SQL action
+# structure for a single SQL action
 class SQLAction(BaseModel):
     type: str = Field(..., description="select, insert, update, or delete")
     sql: str = Field(..., description="The raw SQL query")
 
 
-# Matches the body structure your Django view expects
+# the body structure that Django expects
 class SQLRequest(BaseModel):
     actions: List[SQLAction]
 
