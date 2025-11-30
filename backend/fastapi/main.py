@@ -1,8 +1,9 @@
+from datetime import datetime
 from typing import List
 
 import httpx
 import requests
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -17,6 +18,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# class Event(BaseModel):
+#     name: str
+#     start_date: datetime
+#     end_date: datetime
+#     category: str
+#     description: str
 
 
 @app.get("/event/get/{id}")
@@ -68,14 +77,17 @@ async def delete_event(id: int):
 
 
 @app.post("/event/create/")
-async def create_event(request):
+async def create_event(request: Request):
     django_url = f"{DJANGO_BACKEND_URL}/create_event/"
 
     try:
-        body = await request.json()
+        body = await request.body()
 
         async with httpx.AsyncClient() as client:
-            response = await client.post(django_url, json=body)
+            response = await client.post(
+                django_url,
+                content=body,
+            )
 
         if response.status_code != 200:
             raise HTTPException(

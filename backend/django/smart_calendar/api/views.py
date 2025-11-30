@@ -28,7 +28,7 @@ def get_events(request):
 
 
 def get_event(request):
-    id = request.GET.get("id")
+    id = request.get("id")
     if not id:
         return JsonResponse(
             {"status": "error", "message": "There is no id"}, status=400
@@ -43,7 +43,7 @@ def get_event(request):
 
 @csrf_exempt
 def delete_event(request):
-    id = request.DELETE.get("id")
+    id = request.get("id")
     if not id:
         return JsonResponse(
             {"status": "error", "message": "There is no id"}, status=400
@@ -66,14 +66,19 @@ def delete_event(request):
 
 @csrf_exempt
 def create_event(request):
-    name = request.POST.get("name")
-    start_date = request.POST.get("start_date")
-    end_date = request.POST.get("end_date")
-    description = request.POST.get("description")
-    category = request.POST.get("category")
-    if not name or not start_date or not end_date or not description or not category:
+    data = json.loads(request.body)
+    name = data.get("name")
+    start_date = data.get("start_date")
+    end_date = data.get("end_date")
+    description = data.get("description")
+    category = data.get("category")
+    if not name or not start_date or not end_date or not category:
         return JsonResponse(
-            {"status": "error", "message": "Not enough parameters"}, status=400
+            {
+                "status": "error",
+                "message": f"Not enough parameters. [{name}, {start_date}, {end_date}, {description}, {category}]",
+            },
+            status=400,
         )
 
     try:
@@ -102,11 +107,12 @@ def update_event(request):
             {"status": "error", "message": "There is no id"}, status=400
         )
 
-    name = request.PATCH.get("name")
-    start_date = request.PATCH.get("start_date")
-    end_date = request.PATCH.get("end_date")
-    description = request.PATCH.get("description")
-    category = request.PATCH.get("category")
+    data = json.loads(request.body)
+    name = data.get("name")
+    start_date = data.get("start_date")
+    end_date = data.get("end_date")
+    description = data.get("description")
+    category = data.get("category")
 
     try:
         event = Event.objects.get(id=id)
