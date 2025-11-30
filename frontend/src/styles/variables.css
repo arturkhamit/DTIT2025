@@ -1,0 +1,21 @@
+:root {
+  --primary-color: #D23580;
+
+  --text-color: #ffffff;
+  --box-s-border:
+    inset 1px 1px #ffffff30, 0 1px 2px #00000030, 0 2px 4px #00000015;
+
+  --border: #ffffff20;
+
+  --bg-dark: #06010c;
+  --bg: #8f8f8f27;
+  --bg-light: #1c1023;
+  --text: #ffe4ff;
+  --text-muted: #c1a3d8;
+  --highlight: #715685;
+  --primary: #296fea;
+  --primary-muted: #1a52b8;
+
+  --font-family: "Open Sans", sans-serif;
+}
+

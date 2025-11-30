@@ -1,0 +1,64 @@
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper input {
+  transition: all 0.2s ease-in-out;
+  font-size: 1.5rem;
+  border: none;
+  color: #ffffff;
+  padding: 20px 15px 10px 15px;
+  font-size: 1.2rem !important;
+  border: 1px solid var(--border);
+  height: 100%;
+}
+
+html:not(.dark-mode) .input-wrapper input {
+  color: #2c2c2c;
+}
+
+.input-wrapper input {
+  outline: none;
+  background: var(--bg-dark);
+  font-family: var(--font-family);
+  transition:
+    background 0s,
+    box-shadow 0.2s ease-in-out,
+    border 0.2s ease-in-out;
+  width: 100%;
+  border-top-left-radius: 18px;
+  border-bottom-left-radius: 18px;
+}
+
+.input-wrapper input:focus,
+.input-wrapper input:not(:placeholder-shown) {
+  outline: none;
+  border: 1px #2870ed solid;
+  box-shadow: 0 0 0 1px #2870ed;
+  background: var(--bg-light);
+}
+
+.input-wrapper label {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  color: #777777;
+  pointer-events: none;
+  background: transparent;
+  text-align: center;
+  width: 60px;
+  transition:
+    background 0s,
+    0.3s ease;
+}
+
+.input-wrapper input:focus + label,
+.input-wrapper input:not(:placeholder-shown) + label {
+  top: 15px;
+  left: 7px;
+  color: var(--primary-color);
+  font-size: .9rem;
+}

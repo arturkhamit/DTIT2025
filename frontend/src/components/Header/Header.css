@@ -1,0 +1,126 @@
+@import url("https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&display=swap");
+
+.header-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1500;
+  position: fixed;
+}
+
+.header {
+  background-color: #8f8f8f27;
+  color: #ffffff;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 3vw;
+  border-radius: 60px;
+  margin: 15px 0 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.145);
+  border-left: 1px solid rgba(255, 255, 255, 0.145);
+  width: 100%;
+  min-width: 230px;
+  transition: border-radius 0.3s;
+}
+
+.header-wrapper {
+  width: 35%;
+  min-width: 230px;
+  align-self: center;
+  display: flex;
+  justify-content: center;
+  z-index: 1500;
+  position: relative;
+}
+
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.logo-circle {
+  position: relative;
+  width: 15px;
+  height: 15px;
+  background-color: #e96ff7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-circle::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: 15px;
+  height: 15px;
+  background-color: #e96ff7;
+  filter: blur(5px);
+  -webkit-filter: blur(5px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-decoration: none;
+  font-family: "Elms sans", sans-serif;
+  margin: 0;
+}
+
+.nav-links {
+  display: flex;
+  gap: 15px;
+  transition: padding 0s !important;
+}
+
+.nav-links.open {
+  backdrop-filter: blur(10px) !important;
+}
+
+.nav-links.open + .header {
+  border-radius: 60px 60px 0 60px !important;
+}
+
+.link {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 500;
+  transition: color 0.3s;
+  position: relative;
+  font-family: "Elms Sans", sans-serif;
+  letter-spacing: -0.5px;
+}
+
+.link:hover {
+  color: var(--primary);
+}
+
+@media screen and (max-width: 1200px) {
+  .nav-links {
+    gap: 16px;
+  }
+}
+
+@media screen and (max-width: 560px) {
+  .header {
+    padding: 10px 30px;
+  }
+}
