@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  calendar_db:
+    image: pgvector/pgvector:pg16
+    container_name: calendar_db
+    restart: always
+    environment:
+      POSTGRES_USER: calendar_user
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: calendardb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend_net
+
+  django_app:
+    build: .
+    container_name: django-app
+    working_dir: /django/smart_calendar
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./django/smart_calendar:/django/smart_calendar
+    env_file:
+      - ./.env
+    depends_on:
+      - calendar_db
+    networks:
+      - backend_net
+
+  fastapi_app:
+    build: .
+    container_name: fastapi-app
+    working_dir: /fastapi
+    command: uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./fastapi:/fastapi
+    env_file:
+      - ./.env
+    depends_on:
+      - calendar_db
+    networks:
+      - backend_net
+
+networks:
+  backend_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
